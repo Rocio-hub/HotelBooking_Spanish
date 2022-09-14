@@ -24,10 +24,3 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
   
-  test:
-    
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
