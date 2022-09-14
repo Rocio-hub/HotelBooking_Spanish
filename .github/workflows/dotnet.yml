@@ -30,6 +30,6 @@ jobs:
     
     steps:
     - name: Test
-      run: dotnet test --verbosity normal
+      run: dotnet test HotelBooking_Spanish/HotelBooking.IntegrationTests/HotelBooking.IntegrationTests.csproj
     
   
