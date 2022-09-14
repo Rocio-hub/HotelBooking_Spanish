@@ -5,7 +5,6 @@ namespace HotelBooking.Core
     public class Booking
     {
         public int Id { get; set; }
-
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
