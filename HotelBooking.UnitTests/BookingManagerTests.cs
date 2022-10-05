@@ -56,6 +56,7 @@ namespace HotelBooking.UnitTests
             Assert.Throws<ArgumentException>(act);
         }
 
+        [Fact]
         public void CreateBooking_3Oct1Oct_ThrowsArgumentException()
         {
             // Arrange
