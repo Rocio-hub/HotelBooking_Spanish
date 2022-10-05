@@ -26,7 +26,7 @@ namespace HotelBooking.UnitTests
             bookings = new List<Booking>
             {
                 new Booking { Id=1, StartDate=startDate, EndDate=endDate, CustomerId=1, RoomId=1, IsActive=false},
-                new Booking { Id=2, StartDate=startDate, EndDate=endDate, CustomerId=2, RoomId=2, IsActive=false},
+                new Booking { Id=2, StartDate=startDate, EndDate=endDate, CustomerId=2, RoomId=2, IsActive=true},
             };
 
             var rooms = new List<Room>
@@ -142,7 +142,7 @@ namespace HotelBooking.UnitTests
 
         [Theory]
         [InlineData(1, 3, true)]
-        [InlineData(2, 1, true)]
+        [InlineData(2, 1, false)]
         public void UpdateBooking_UpdateIsCalled(int id, int customerId, bool isActive)
         {
             // Act
