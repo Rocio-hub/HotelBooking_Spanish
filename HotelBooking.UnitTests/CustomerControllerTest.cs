@@ -8,5 +8,6 @@ namespace HotelBooking.UnitTests
 {
     public class CustomerControllerTest
     {
+
     }
 }
