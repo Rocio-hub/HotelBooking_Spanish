@@ -94,13 +94,15 @@ namespace HotelBooking.WebApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            if (bookingRepository.Get(id) == null)
+            if (id > 0)
             {
-                return NotFound();
+                bookingRepository.Remove(id);
+                return NoContent();
             }
-
-            bookingRepository.Remove(id);
-            return NoContent();
+            else
+            {
+                return BadRequest();
+            }
         }
 
     }

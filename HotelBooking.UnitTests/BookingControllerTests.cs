@@ -37,7 +37,7 @@ namespace HotelBooking.UnitTests
             var customers = new List<Customer>
             {
                 new Customer { Id=1, Name="A", Email="A@A.com" },
-                new Customer {Id=2, Name="B", Email="B@B.com" }
+                new Customer { Id=2, Name="B", Email="B@B.com" }
             };
 
             // Create fake BookingRepository. 
@@ -92,6 +92,55 @@ namespace HotelBooking.UnitTests
 
             // Assert
             Assert.Equal(2, noOfBookings);
+        }
+
+        [Fact]
+        public void GetById_BookingExists_ReturnsIActionResultWithBooking()
+        {
+            // Act
+            var result = controller.Get(2) as ObjectResult;
+            var booking = result.Value as Booking;
+            var bookingId = booking.Id;
+
+            // Assert
+            Assert.InRange<int>(bookingId, 1, 2);
+        }
+
+        [Fact]
+        public void Delete_WhenIdIsLargerThanZero_RemoveIsCalled()
+        {
+            // Act
+            controller.Delete(1);
+
+            // Assert against the mock object
+            fakeBookingRepository.Verify(x => x.Remove(1), Times.Once);
+        }
+
+        [Fact]
+        public void Delete_WhenIdIsLessThanOne_RemoveIsNotCalled()
+        {
+            // Act
+            controller.Delete(0);
+
+            // Assert against the mock object
+            fakeBookingRepository.Verify(x => x.Remove(It.IsAny<int>()), Times.Never());
+        }
+
+        [Fact]
+        public void Delete_WhenIdIsLargerThanTwo_RemoveThrowsException()
+        {
+            // Instruct the fake Remove method to throw an InvalidOperationException, if a room id that
+            // does not exist in the repository is passed as a parameter. This behavior corresponds to
+            // the behavior of the real repoository's Remove method.
+            fakeBookingRepository.Setup(x =>
+                    x.Remove(It.Is<int>(id => id < 1 || id > 2))).
+                    Throws<InvalidOperationException>();
+
+            // Assert
+            Assert.Throws<InvalidOperationException>(() => controller.Delete(3));
+
+            // Assert against the mock object
+            fakeBookingRepository.Verify(x => x.Remove(It.IsAny<int>()));
         }
     }
 }
