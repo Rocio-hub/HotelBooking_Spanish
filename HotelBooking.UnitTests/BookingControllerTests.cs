@@ -58,11 +58,6 @@ namespace HotelBooking.UnitTests
             // Implement fake GetAll() method.
             fakeCustomerRepository.Setup(x => x.GetAll()).Returns(customers);
 
-
-            // Implement fake Get() method.
-            //fakeRoomRepository.Setup(x => x.Get(2)).Returns(rooms[1]);
-
-
             // Alternative setup with argument matchers:
 
             // Any integer:
@@ -98,12 +93,24 @@ namespace HotelBooking.UnitTests
         [Theory]
         [InlineData(2, 1, 2)]
         [InlineData(1, 1, 2)]
-        public void GetById_BookingExists_ReturnsIActionResultWithBooking(int id, int low, int high)
+        public void GetById_BookingExists_ReturnsFromRange(int id, int low, int high)
         {
             // Act
             var result = controller.Get(id) as ObjectResult;
             var booking = result.Value as Booking;
             var bookingId = booking.Id;
+
+            // Assert
+            Assert.InRange<int>(bookingId, low, high);
+        }
+
+        [Theory]
+        [InlineData(2, 1, 2)]
+        [InlineData(1, 1, 2)]
+        public void GetById_BookingExists_ReturnsId(int id, int low, int high)
+        {
+            // Act
+            fakeBookingRepository.Setup(x => x.Get(1)).Returns(bookings[0]);
 
             // Assert
             Assert.InRange<int>(bookingId, low, high);
