@@ -99,9 +99,6 @@ namespace HotelBooking.UnitTests
             Assert.NotEqual(-1, roomId);
         }
 
-        [Fact]
-
-
         [Fact]        
         public void GetFullyOccupiedDates_5octAnd6oct_ReturnEmpty()
         {
