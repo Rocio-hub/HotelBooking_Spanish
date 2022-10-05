@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HotelBooking.Core;
 using HotelBooking.UnitTests.Fakes;
 using Xunit;
@@ -15,6 +16,63 @@ namespace HotelBooking.UnitTests
             IRepository<Booking> bookingRepository = new FakeBookingRepository(start, end);
             IRepository<Room> roomRepository = new FakeRoomRepository();
             bookingManager = new BookingManager(bookingRepository, roomRepository);
+        }
+
+        [Fact]
+        public void CreateBooking_ResultNotFalse()
+        {
+            // Arrange
+            Booking booking = new Booking();
+            DateTime startDate = new DateTime(2023, 10, 1);
+            DateTime endDate = new DateTime(2023, 10, 3);
+
+            booking.StartDate = startDate;
+            booking.EndDate = endDate;
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
+
+            // Act
+            bool isCreated = bookingManager.CreateBooking(booking);
+            // Assert
+            Assert.True(isCreated);
+        }
+
+        [Fact]
+        public void CreateBooking_PastDate_ThrowsArgumentException()
+        {
+            // Arrange
+            Booking booking = new Booking();
+            DateTime startDate = new DateTime(2021, 10, 1);
+            DateTime endDate = new DateTime(2021, 10, 3);
+
+            booking.StartDate = startDate;
+            booking.EndDate = endDate;
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
+
+            // Act
+            Action act = () => bookingManager.CreateBooking(booking);
+            // Assert
+            Assert.Throws<ArgumentException>(act);
+        }
+
+        public void CreateBooking_3Oct1Oct_ThrowsArgumentException()
+        {
+            // Arrange
+            Booking booking = new Booking();
+            DateTime startDate = new DateTime(2021, 10, 1);
+            DateTime endDate = new DateTime(2021, 10, 3);
+
+            booking.StartDate = endDate;
+            booking.EndDate = startDate;
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
+
+            // Act
+            Action act = () => bookingManager.CreateBooking(booking);
+
+            //Assert
+            Assert.Throws<ArgumentException>(act);
         }
 
         [Fact]
@@ -42,58 +100,40 @@ namespace HotelBooking.UnitTests
         }
 
         [Fact]
-        public void CreateBooking_ResultNotFalse()
+
+
+        [Fact]        
+        public void GetFullyOccupiedDates_5octAnd6oct_ReturnEmpty()
         {
-            // Arrange
-            Booking booking = new Booking();
-            DateTime startDate = new DateTime(2023, 10, 1);
-            DateTime endDate = new DateTime(2023, 10, 3);
-
-            booking.StartDate = startDate;
-            booking.EndDate = endDate;
-            booking.CustomerId = 1;
-            booking.RoomId = 1;
-
-            // Act
-            bool isCreate = bookingManager.CreateBooking(booking);
-            // Assert
-            Assert.True(isCreate);
+           // Arrange
+           DateTime startDate = new DateTime(2022,10,05);
+           DateTime endDate = startDate.AddDays(1);
+           // Act
+           List<DateTime> occupied = bookingManager.GetFullyOccupiedDates(startDate, endDate);
+           // Assert
+           Assert.Equal(0,occupied.Count);
         }
 
         [Fact]
-        public void CreateBooking_PastDate_ThrowsArgumentException()
+        public void GetFullyOccupiedDates_9octAnd19oct_ReturnsFive()
         {
             // Arrange
-            Booking booking = new Booking();
-            DateTime startDate = new DateTime(2021, 10, 1);
-            DateTime endDate = new DateTime(2021, 10, 3);
-
-            booking.StartDate = startDate;
-            booking.EndDate = endDate;
-            booking.CustomerId = 1;
-            booking.RoomId = 1;
-
+            DateTime startDate = new DateTime(2022, 10, 09);
+            DateTime endDate = startDate.AddDays(10);
             // Act
-            Action act = () => bookingManager.CreateBooking(booking);
+            List<DateTime> occupied = bookingManager.GetFullyOccupiedDates(startDate, endDate);
             // Assert
-            Assert.Throws<ArgumentException>(act);
+            Assert.Equal(5, occupied.Count);
         }
 
         [Fact]
-        public void CreateBooking_3Oct1Oct_ThrowsArgumentException()
+        public void GetFullyOccupiedDates_19octAnd9oct_ThrowsArgumentException()
         {
             // Arrange
-            Booking booking = new Booking();
-            DateTime startDate = new DateTime(2021, 10, 1);
-            DateTime endDate = new DateTime(2021, 10, 3);
-
-            booking.StartDate = endDate;
-            booking.EndDate = startDate;
-            booking.CustomerId = 1;
-            booking.RoomId = 1;
-
+            DateTime startDate = new DateTime(2022, 10, 09);
+            DateTime endDate = startDate.AddDays(10);
             // Act
-            Action act = () => bookingManager.CreateBooking(booking);
+            Action act = () => bookingManager.GetFullyOccupiedDates(endDate, startDate);
             // Assert
             Assert.Throws<ArgumentException>(act);
         }
