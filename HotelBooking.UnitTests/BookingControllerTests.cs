@@ -17,12 +17,13 @@ namespace HotelBooking.UnitTests
         private Mock<IRepository<Room>> fakeRoomRepository;
         private Mock<IRepository<Customer>> fakeCustomerRepository;
         private IBookingManager bookingManager;
+        List<Booking> bookings = new List<Booking>();
 
         public BookingControllerTests()
         {
             DateTime startDate = new DateTime(2023, 10, 1);
             DateTime endDate = new DateTime(2023, 10, 3);
-            var bookings = new List<Booking>
+            bookings = new List<Booking>
             {
                 new Booking { Id=1, StartDate=startDate, EndDate=endDate, CustomerId=1, RoomId=1},
                 new Booking { Id=2, StartDate=endDate, EndDate=endDate, CustomerId=2, RoomId=2},
@@ -105,15 +106,16 @@ namespace HotelBooking.UnitTests
         }
 
         [Theory]
-        [InlineData(2, 1, 2)]
-        [InlineData(1, 1, 2)]
-        public void GetById_BookingExists_ReturnsId(int id, int low, int high)
+        [InlineData(1, 1)]
+        [InlineData(2, 2)]
+        public void GetById_ReturnsCorrectBooking(int id, int idExpected)
         {
             // Act
-            fakeBookingRepository.Setup(x => x.Get(1)).Returns(bookings[0]);
-
+            fakeBookingRepository.Setup(x => x.Get(id)).Returns(bookings[id - 1]);
+            var result = controller.Get(id) as ObjectResult;
+            var booking = result.Value as Booking;
             // Assert
-            Assert.InRange<int>(bookingId, low, high);
+            Assert.Equal(idExpected, booking.Id);
         }
 
         [Theory]
