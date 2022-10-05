@@ -61,7 +61,7 @@ namespace HotelBooking.UnitTests
         }
 
         [Fact]
-        public void CreateBooking_PastDate_ResultException()
+        public void CreateBooking_PastDate_ThrowsArgumentException()
         {
             // Arrange
             Booking booking = new Booking();
@@ -80,7 +80,7 @@ namespace HotelBooking.UnitTests
         }
 
         [Fact]
-        public void CreateBooking_3Oct1Oct_ResultException()
+        public void CreateBooking_3Oct1Oct_ThrowsArgumentException()
         {
             // Arrange
             Booking booking = new Booking();
