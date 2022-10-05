@@ -56,6 +56,7 @@ namespace HotelBooking.UnitTests
             Assert.Throws<ArgumentException>(act);
         }
 
+        [Fact]
         public void CreateBooking_3Oct1Oct_ThrowsArgumentException()
         {
             // Arrange
@@ -98,9 +99,6 @@ namespace HotelBooking.UnitTests
             // Assert
             Assert.NotEqual(-1, roomId);
         }
-
-        [Fact]
-
 
         [Fact]        
         public void GetFullyOccupiedDates_5octAnd6oct_ReturnEmpty()
