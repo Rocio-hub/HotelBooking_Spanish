@@ -22,6 +22,17 @@ namespace HotelBooking.WebApi.Controllers
         {
             return repository.GetAll();
         }
+        //GETById
+        [HttpGet("{id}")]
+        public Customer GetById(int id)
+        {
+            var item = repository.Get(id);
+            if (item == null)
+            {
+                throw new Exception("Customer not Found");
+            }
+            return item;
+        }
 
     }
 }
