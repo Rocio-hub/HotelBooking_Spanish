@@ -74,16 +74,6 @@ namespace HotelBooking.UnitTests
             bookingManager = new BookingManager(_mockBookingRepository.Object, _mockRoomRepository.Object);
         }
 
-        public static IEnumerable<object[]> GetLocalData_FindAvailableRoom()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(2), -1, false}
-            };
-
-            return data;
-        }
-
         [Fact]
         public void CreateBooking_ValidDates_isCreatedIsTrue()
         {
@@ -113,18 +103,21 @@ namespace HotelBooking.UnitTests
             //Assert
             Assert.Throws<ArgumentException>(act);
         }
-
-        /*
-        [Theory]
-        [MemberData(nameof(GetLocalData_FindAvailableRoom))]
-        public void FindAvailableRoom_ValidMemberData_RoomIdPositive(DateTime date, int roomId, bool expectedResult)
+                
+        [Fact]
+        public void FindAvailableRoom_ValidData_RoomIdPositive()
         {
+            //Arrange
+            var startDate = new DateTime(2022, 10, 7);
+            var endDate = new DateTime(2022, 10, 8);
+            //bookingList[1].IsActive = true;
             //Act
-            var actualResult = roomId > 0;
+            var roomId = bookingManager.FindAvailableRoom(startDate, endDate);
             // Assert
-            Assert.Equal(expectedResult, actualResult);
+            Assert.NotEqual(-1, roomId);
         }
 
+        /*
         [Theory]
         [InlineData("2022-10-05", "2022-10-09", 0)]
         [InlineData("2022-10-09", "2022-10-19", 4)]
