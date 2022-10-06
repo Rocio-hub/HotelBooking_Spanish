@@ -25,6 +25,7 @@ namespace HotelBooking.UnitTests
             {
                 new object[] {DateTime.Today.AddDays(2), -1, false}
             };
+
             return data;
         }
 
@@ -84,7 +85,7 @@ namespace HotelBooking.UnitTests
 
         [Theory]
         [InlineData("2022-10-05", "2022-10-09", 0)]
-        [InlineData("2022-10-09", "2022-10-19", 5)]
+        [InlineData("2022-10-09", "2022-10-19", 4)]
         public void GetFullyOccupiedDates_ValidMemberData(DateTime startDate, DateTime endDate, int expectedResult)
         {
             // Act
