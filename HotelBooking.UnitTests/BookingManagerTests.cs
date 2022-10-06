@@ -46,7 +46,7 @@ namespace HotelBooking.UnitTests
             //Act
             bool isCreated = bookingManager.CreateBooking(booking);
             //Assert
-            Assert.True(isCreated);
+            Assert.True(isCreated==expectedResult);
         }
 
         [Theory]
