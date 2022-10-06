@@ -25,7 +25,6 @@ namespace HotelBooking.UnitTests
             {
                 new object[] {DateTime.Today.AddDays(2), -1, false}
             };
-
             return data;
         }
 
