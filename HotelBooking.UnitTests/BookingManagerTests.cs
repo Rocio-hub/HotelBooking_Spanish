@@ -92,37 +92,29 @@ namespace HotelBooking.UnitTests
             booking.StartDate = DateTime.Today.AddDays(1);
             booking.EndDate = booking.StartDate.AddDays(2);
             booking.CustomerId = 1;
-            booking.RoomId = 1;      
+            booking.RoomId = 1;
             //Act
             bool isCreated = bookingManager.CreateBooking(booking);
             //Assert
             Assert.True(isCreated);
         }
-        /*
-        [Theory]
-        [InlineData("2021,10,01", "2021,10,03", 1, 1, typeof(ArgumentException), "The start date cannot be in the past or later than the end date.")]
-        public void FindAvailableRoom_ValidInlineData_ThrowsException(DateTime startDate, DateTime endDate, int customerId, int roomId, Type exceptionType, string message)
+
+        [Fact]      
+        public void FindAvailableRoom_ValidData_ThrowsException()
         {
             //Arrange
             Booking booking = new Booking();
-
-            booking.StartDate = startDate;
-            booking.EndDate = endDate;
-            booking.CustomerId = customerId;
-            booking.RoomId = roomId;
+            booking.StartDate = new DateTime(2021,10,06);
+            booking.EndDate = new DateTime(2021, 10, 07);
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
             //Act
-            try
-            {
-                bool isCreated = bookingManager.CreateBooking(booking);
-            }
-            catch (Exception e)
-            {
-                //Assert
-                Assert.True(e.GetType() == exceptionType);
-                Assert.Equal(e.Message, message);
-            }
+            Action act = () => bookingManager.CreateBooking(booking);
+            //Assert
+            Assert.Throws<ArgumentException>(act);
         }
 
+        /*
         [Theory]
         [MemberData(nameof(GetLocalData_FindAvailableRoom))]
         public void FindAvailableRoom_ValidMemberData_RoomIdPositive(DateTime date, int roomId, bool expectedResult)
