@@ -55,7 +55,7 @@ namespace HotelBooking.UnitTests
             {
                 Id = 2,
                 StartDate = DateTime.Today.AddDays(2),
-                EndDate = DateTime.Today.AddDays(3),
+                EndDate = DateTime.Today.AddDays(7),
                 IsActive = false,
                 Customer = customer2,
                 CustomerId = customer2.Id,
@@ -89,12 +89,12 @@ namespace HotelBooking.UnitTests
             Assert.True(isCreated);
         }
 
-        [Fact]      
+        [Fact]
         public void FindAvailableRoom_ValidData_ThrowsException()
         {
             //Arrange
             Booking booking = new Booking();
-            booking.StartDate = new DateTime(2021,10,06);
+            booking.StartDate = new DateTime(2021, 10, 06);
             booking.EndDate = new DateTime(2021, 10, 07);
             booking.CustomerId = 1;
             booking.RoomId = 1;
@@ -103,7 +103,7 @@ namespace HotelBooking.UnitTests
             //Assert
             Assert.Throws<ArgumentException>(act);
         }
-                
+
         [Fact]
         public void FindAvailableRoom_ValidData_RoomIdPositive()
         {
@@ -117,33 +117,40 @@ namespace HotelBooking.UnitTests
             Assert.NotEqual(-1, roomId);
         }
 
-        /*
         [Theory]
-        [InlineData("2022-10-05", "2022-10-09", 0)]
-        [InlineData("2022-10-09", "2022-10-19", 4)]
+        [MemberData(nameof(GetLocalData_GetFullyOccupiedDates))]
         public void GetFullyOccupiedDates_ValidMemberData(DateTime startDate, DateTime endDate, int expectedResult)
         {
             // Act
+            bookingList[1].IsActive = true;
             List<DateTime> occupied = bookingManager.GetFullyOccupiedDates(startDate, endDate);
             // Assert
             Assert.Equal(expectedResult, occupied.Count);
         }
 
-        [Theory]
-        [InlineData("2022-10-09", "2022-10-19", typeof(ArgumentException), "The start date cannot be later than the end date.")]
-        public void GetFullyOccupiedDates_ValidInlineData_ThrowsException(DateTime startDate, DateTime endDate, Type exceptionType, string message)
+        public static IEnumerable<object[]> GetLocalData_GetFullyOccupiedDates()
+        {
+            var data = new List<object[]>
+            {
+                new object[] {DateTime.Today.AddDays(1), DateTime.Today.AddDays(2), 1},
+                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(7), 1},
+                new object[] {DateTime.Today.AddDays(8), DateTime.Today.AddDays(9), 0}
+            };
+            return data;
+        }
+
+
+        [Fact]
+        public void GetFullyOccupiedDates_ValidInlineData_ThrowsException()
         {
             // Arrange
-            string startD = startDate.ToString();
-            string endD = endDate.ToString();
+            var startDate = new DateTime(2022, 10, 19);
+            var endDate = new DateTime(2022, 10, 09);
             // Act
-            {
-                List<DateTime> list = bookingManager.GetFullyOccupiedDates(endDate, startDate);
-                // Assert
-                //  Assert.True(e.GetType() == exceptionType);
-                //  Assert.Equal(e.Message, message);
-            }
-        }*/
+            Action act = () => bookingManager.GetFullyOccupiedDates(startDate, endDate);
+            // Assert
+            Assert.Throws<ArgumentException>(act);
+        }
 
     }
 }
