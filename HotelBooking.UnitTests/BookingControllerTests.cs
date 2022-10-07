@@ -12,6 +12,7 @@ namespace HotelBooking.UnitTests
 {
     public class BookingControllerTests
     {
+
         private BookingsController controller;
         private Mock<IRepository<Booking>> fakeBookingRepository;
         private Mock<IRepository<Room>> fakeRoomRepository;
