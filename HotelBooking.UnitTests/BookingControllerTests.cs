@@ -19,6 +19,7 @@ namespace HotelBooking.UnitTests
         private IBookingManager bookingManager;
         List<Booking> bookings = new List<Booking>();
 
+
         public BookingControllerTests()
         {
             DateTime startDate = new DateTime(2023, 10, 1);

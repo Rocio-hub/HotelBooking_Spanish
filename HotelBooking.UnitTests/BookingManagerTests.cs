@@ -88,8 +88,9 @@ namespace HotelBooking.UnitTests
             //Assert
             Assert.True(isCreated);
         }
+
         [Fact]
-        public void FindAvailableRoom_ValidData_RoomIdPositive()
+        public void FindAvailableRoom_ValidData_RoomIdNotMinusOne()
         {
             //Arrange
             var startDate = new DateTime(2022, 10, 8);
@@ -118,7 +119,7 @@ namespace HotelBooking.UnitTests
 
         [Theory]
         [MemberData(nameof(GetLocalData_GetFullyOccupiedDates))]
-        public void GetFullyOccupiedDates_ValidMemberData(DateTime startDate, DateTime endDate, int expectedResult)
+        public void GetFullyOccupiedDates_ValidMemberData_RightNumberOfFullyOccupiedDates(DateTime startDate, DateTime endDate, int expectedResult)
         {
             // Act
             bookingList[1].IsActive = true;
@@ -138,7 +139,6 @@ namespace HotelBooking.UnitTests
             return data;
         }
 
-
         [Fact]
         public void GetFullyOccupiedDates_ValidInlineData_ThrowsException()
         {
@@ -150,6 +150,5 @@ namespace HotelBooking.UnitTests
             // Assert
             Assert.Throws<ArgumentException>(act);
         }
-
     }
 }
