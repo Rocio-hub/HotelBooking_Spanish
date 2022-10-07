@@ -1,7 +1,7 @@
+using HotelBooking.Core;
+using Moq;
 using System;
 using System.Collections.Generic;
-using HotelBooking.Core;
-using HotelBooking.UnitTests.Fakes;
 using Xunit;
 
 namespace HotelBooking.UnitTests
@@ -9,110 +9,148 @@ namespace HotelBooking.UnitTests
     public class BookingManagerTests
     {
         private IBookingManager bookingManager;
+        private readonly Mock<IRepository<Booking>> _mockBookingRepository;
+        private readonly Mock<IRepository<Room>> _mockRoomRepository;
+
+        List<Room> roomList = new List<Room>();
+        List<Booking> bookingList = new List<Booking>();
 
         public BookingManagerTests()
         {
-            DateTime start = DateTime.Today.AddDays(10);
-            DateTime end = DateTime.Today.AddDays(20);
-            IRepository<Booking> bookingRepository = new FakeBookingRepository(start, end);
-            IRepository<Room> roomRepository = new FakeRoomRepository();
-            bookingManager = new BookingManager(bookingRepository, roomRepository);
-        }
+            _mockBookingRepository = new Mock<IRepository<Booking>>();
+            _mockRoomRepository = new Mock<IRepository<Room>>();
 
-        public static IEnumerable<object[]> GetLocalData_FindAvailableRoom()
-        {
-            var data = new List<object[]>
+            //DateTime start = DateTime.Today.AddDays(10);
+            //DateTime end = DateTime.Today.AddDays(20);
+
+            Customer customer1 = new Customer();
+            customer1.Name = "Customer1";
+            customer1.Email = "customer1@email";
+
+            Customer customer2 = new Customer();
+            customer2.Name = "Customer2";
+            customer2.Email = "customer2@email";
+
+            roomList.Add(new Room()
             {
-                new object[] {DateTime.Today.AddDays(2), -1, false}
-            };
+                Id = 1,
+                Description = "Room number one"
+            });
+            roomList.Add(new Room()
+            {
+                Id = 2,
+                Description = "Room number two"
+            });
 
-            return data;
+            bookingList.Add(new Booking()
+            {
+                Id = 1,
+                StartDate = DateTime.Today.AddDays(1),
+                EndDate = DateTime.Today.AddDays(2),
+                IsActive = true,
+                Customer = customer1,
+                CustomerId = customer1.Id,
+                RoomId = roomList[0].Id,
+                Room = roomList[0]
+            });
+
+            bookingList.Add(new Booking()
+            {
+                Id = 2,
+                StartDate = DateTime.Today.AddDays(2),
+                EndDate = DateTime.Today.AddDays(7),
+                IsActive = false,
+                Customer = customer2,
+                CustomerId = customer2.Id,
+                RoomId = roomList[1].Id,
+                Room = roomList[1]
+            });
+
+            //Setup
+            _mockRoomRepository.Setup(x => x.GetAll()).Returns(roomList);
+            _mockBookingRepository.Setup(x => x.GetAll()).Returns(bookingList);
+            _mockBookingRepository.Setup(x => x.Add(It.IsAny<Booking>())).Callback<Booking>((s) => bookingList.Add(s));
+
+            bookingManager = new BookingManager(_mockBookingRepository.Object, _mockRoomRepository.Object);
         }
 
-        [Theory]
-        [InlineData("2023,10,01", "2023,10,03", 1, 1, true)]
-        public void CreateBooking_ValidInlineData_BookingIsCreated(DateTime startDate, DateTime endDate, int customerId, int roomId, bool expectedResult)
+        [Fact]
+        public void CreateBooking_ValidDates_isCreatedIsTrue()
         {
             //Arrange
             Booking booking = new Booking();
-            // string startD = startDate.ToString();
-            // string endD = endDate.ToString();
-
-            booking.StartDate = startDate;
-            booking.EndDate = endDate;
-            booking.CustomerId = customerId;
-            booking.RoomId = roomId;
-
+            booking.StartDate = DateTime.Today.AddDays(1);
+            booking.EndDate = booking.StartDate.AddDays(2);
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
             //Act
             bool isCreated = bookingManager.CreateBooking(booking);
             //Assert
             Assert.True(isCreated);
         }
+        [Fact]
+        public void FindAvailableRoom_ValidData_RoomIdPositive()
+        {
+            //Arrange
+            var startDate = new DateTime(2022, 10, 8);
+            var endDate = new DateTime(2022, 10, 9);
+            //bookingList[1].IsActive = true;
+            //Act
+            var roomId = bookingManager.FindAvailableRoom(startDate, endDate);
+            // Assert
+            Assert.NotEqual(-1, roomId);
+        }
 
-        [Theory]
-        [InlineData("2021,10,01", "2021,10,03", 1, 1, typeof(ArgumentException), "The start date cannot be in the past or later than the end date.")]
-        public void FindAvailableRoom_ValidInlineData_ThrowsException(DateTime startDate, DateTime endDate, int customerId, int roomId, Type exceptionType, string message)
+        [Fact]
+        public void FindAvailableRoom_ValidData_ThrowsException()
         {
             //Arrange
             Booking booking = new Booking();
-
-            booking.StartDate = startDate;
-            booking.EndDate = endDate;
-            booking.CustomerId = customerId;
-            booking.RoomId = roomId;
+            booking.StartDate = new DateTime(2021, 10, 07);
+            booking.EndDate = new DateTime(2021, 10, 08);
+            booking.CustomerId = 1;
+            booking.RoomId = 1;
             //Act
-            try
-            {
-                bool isCreated = bookingManager.CreateBooking(booking);
-            }
-            catch (Exception e)
-            {
-                //Assert
-                Assert.True(e.GetType() == exceptionType);
-                Assert.Equal(e.Message, message);
-            }
+            Action act = () => bookingManager.CreateBooking(booking);
+            //Assert
+            Assert.Throws<ArgumentException>(act);
         }
 
 
         [Theory]
-        [MemberData(nameof(GetLocalData_FindAvailableRoom))]
-        public void FindAvailableRoom_ValidMemberData_RoomIdPositive(DateTime date, int roomId, bool expectedResult)
-        {
-            //Act
-            var actualResult = roomId > 0;
-            // Assert
-            Assert.Equal(expectedResult, actualResult);
-        }
-
-        [Theory]
-        [InlineData("2022-10-05", "2022-10-09", 0)]
-        [InlineData("2022-10-09", "2022-10-19", 5)]
+        [MemberData(nameof(GetLocalData_GetFullyOccupiedDates))]
         public void GetFullyOccupiedDates_ValidMemberData(DateTime startDate, DateTime endDate, int expectedResult)
         {
             // Act
+            bookingList[1].IsActive = true;
             List<DateTime> occupied = bookingManager.GetFullyOccupiedDates(startDate, endDate);
             // Assert
             Assert.Equal(expectedResult, occupied.Count);
         }
 
-        [Theory]
-        [InlineData("2022-10-09", "2022-10-19", typeof(ArgumentException), "The start date cannot be later than the end date.")]
-        public void GetFullyOccupiedDates_ValidInlineData_ThrowsException(DateTime startDate, DateTime endDate, Type exceptionType, string message)
+        public static IEnumerable<object[]> GetLocalData_GetFullyOccupiedDates()
+        {
+            var data = new List<object[]>
+            {
+                new object[] {DateTime.Today.AddDays(1), DateTime.Today.AddDays(2), 1},
+                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(7), 1},
+                new object[] {DateTime.Today.AddDays(8), DateTime.Today.AddDays(9), 0}
+            };
+            return data;
+        }
+
+
+        [Fact]
+        public void GetFullyOccupiedDates_ValidInlineData_ThrowsException()
         {
             // Arrange
-            string startD = startDate.ToString();
-            string endD = endDate.ToString();
+            var startDate = new DateTime(2022, 10, 20);
+            var endDate = new DateTime(2022, 10, 10);
             // Act
-            try
-            {
-                List<DateTime> list = bookingManager.GetFullyOccupiedDates(endDate, startDate);
-            }
-            catch (Exception e)
-            {
-                // Assert
-                Assert.True(e.GetType() == exceptionType);
-                Assert.Equal(e.Message, message);
-            }
+            Action act = () => bookingManager.GetFullyOccupiedDates(startDate, endDate);
+            // Assert
+            Assert.Throws<ArgumentException>(act);
         }
+
     }
 }
