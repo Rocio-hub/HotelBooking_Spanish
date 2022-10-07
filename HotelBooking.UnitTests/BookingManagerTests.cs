@@ -17,8 +17,11 @@ namespace HotelBooking.UnitTests
 
         public BookingManagerTests()
         {
-            DateTime start = DateTime.Today.AddDays(10);
-            DateTime end = DateTime.Today.AddDays(20);
+            _mockBookingRepository = new Mock<IRepository<Booking>>();
+            _mockRoomRepository = new Mock<IRepository<Room>>();
+
+            //DateTime start = DateTime.Today.AddDays(10);
+            //DateTime end = DateTime.Today.AddDays(20);
 
             Customer customer1 = new Customer();
             customer1.Name = "Customer1";
@@ -63,9 +66,6 @@ namespace HotelBooking.UnitTests
                 Room = roomList[1]
             });
 
-            _mockBookingRepository = new Mock<IRepository<Booking>>();
-            _mockRoomRepository = new Mock<IRepository<Room>>();
-
             //Setup
             _mockRoomRepository.Setup(x => x.GetAll()).Returns(roomList);
             _mockBookingRepository.Setup(x => x.GetAll()).Returns(bookingList);
@@ -88,33 +88,32 @@ namespace HotelBooking.UnitTests
             //Assert
             Assert.True(isCreated);
         }
+        [Fact]
+        public void FindAvailableRoom_ValidData_RoomIdPositive()
+        {
+            //Arrange
+            var startDate = new DateTime(2022, 10, 8);
+            var endDate = new DateTime(2022, 10, 9);
+            //bookingList[1].IsActive = true;
+            //Act
+            var roomId = bookingManager.FindAvailableRoom(startDate, endDate);
+            // Assert
+            Assert.NotEqual(-1, roomId);
+        }
 
         [Fact]
         public void FindAvailableRoom_ValidData_ThrowsException()
         {
             //Arrange
             Booking booking = new Booking();
-            booking.StartDate = new DateTime(2021, 10, 06);
-            booking.EndDate = new DateTime(2021, 10, 07);
+            booking.StartDate = new DateTime(2021, 10, 07);
+            booking.EndDate = new DateTime(2021, 10, 08);
             booking.CustomerId = 1;
             booking.RoomId = 1;
             //Act
             Action act = () => bookingManager.CreateBooking(booking);
             //Assert
             Assert.Throws<ArgumentException>(act);
-        }
-
-        [Fact]
-        public void FindAvailableRoom_ValidData_RoomIdPositive()
-        {
-            //Arrange
-            var startDate = new DateTime(2022, 10, 7);
-            var endDate = new DateTime(2022, 10, 8);
-            //bookingList[1].IsActive = true;
-            //Act
-            var roomId = bookingManager.FindAvailableRoom(startDate, endDate);
-            // Assert
-            Assert.NotEqual(-1, roomId);
         }
 
         [Theory]
@@ -144,8 +143,8 @@ namespace HotelBooking.UnitTests
         public void GetFullyOccupiedDates_ValidInlineData_ThrowsException()
         {
             // Arrange
-            var startDate = new DateTime(2022, 10, 19);
-            var endDate = new DateTime(2022, 10, 09);
+            var startDate = new DateTime(2022, 10, 20);
+            var endDate = new DateTime(2022, 10, 10);
             // Act
             Action act = () => bookingManager.GetFullyOccupiedDates(startDate, endDate);
             // Assert
