@@ -73,6 +73,7 @@ namespace HotelBooking.UnitTests
             }
         }
 
+
         [Theory]
         [MemberData(nameof(GetLocalData_FindAvailableRoom))]
         public void FindAvailableRoom_ValidMemberData_RoomIdPositive(DateTime date, int roomId, bool expectedResult)
