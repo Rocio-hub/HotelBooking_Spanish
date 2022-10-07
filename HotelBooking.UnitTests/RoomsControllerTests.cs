@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HotelBooking.Core;
+using HotelBooking.UnitTests.Fakes;
 using HotelBooking.WebApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -89,11 +90,13 @@ namespace HotelBooking.UnitTests
             fakeRoomRepository.Verify(x => x.Remove(idToDelete), Times.Once);
         }
 
-        [Fact]
-        public void Delete_WhenIdIsLessThanOne_RemoveIsNotCalled()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        public void Delete_WhenIdIsLessThanOne_RemoveIsNotCalled(int roomId)
         {
             // Act
-            controller.Delete(0);
+            controller.Delete(roomId);
 
             // Assert against the mock object
             fakeRoomRepository.Verify(x => x.Remove(It.IsAny<int>()), Times.Never());
@@ -116,5 +119,7 @@ namespace HotelBooking.UnitTests
             // Assert against the mock object
             fakeRoomRepository.Verify(x => x.Remove(It.IsAny<int>()));
         }
+
+
     }
 }
