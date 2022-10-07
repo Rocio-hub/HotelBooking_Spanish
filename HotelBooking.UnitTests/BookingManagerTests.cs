@@ -88,6 +88,7 @@ namespace HotelBooking.UnitTests
             //Assert
             Assert.True(isCreated);
         }
+
         [Fact]
         public void FindAvailableRoom_ValidData_RoomIdPositive()
         {
@@ -116,7 +117,6 @@ namespace HotelBooking.UnitTests
             Assert.Throws<ArgumentException>(act);
         }
 
-
         [Theory]
         [MemberData(nameof(GetLocalData_GetFullyOccupiedDates))]
         public void GetFullyOccupiedDates_ValidMemberData(DateTime startDate, DateTime endDate, int expectedResult)
@@ -139,7 +139,6 @@ namespace HotelBooking.UnitTests
             return data;
         }
 
-
         [Fact]
         public void GetFullyOccupiedDates_ValidInlineData_ThrowsException()
         {
@@ -151,6 +150,5 @@ namespace HotelBooking.UnitTests
             // Assert
             Assert.Throws<ArgumentException>(act);
         }
-
     }
 }
